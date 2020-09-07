@@ -1,0 +1,18 @@
+ESP_IDF_PATH = D:/Program/esp32/esp-idf
+
+--target=i686-w64-mingw -std=c11 -Wall
+
+-isystem
+D:/Program/esp32/esp-idf/esp-idf/components/freertos/include
+-isystem
+D:/Program/esp32/esp-idf/esp-idf/components/newlib/include
+-isystem
+D:\Program\esp32\esp-idf\esp-idf\components\xtensa\include
+-isystem
+D:\Program\esp32\esp-idf\esp-idf\components\xtensa\include
+-isystem
+D:\Program\esp32\esp-idf\esp-idf\components\xtensa\esp32\include\xtensa\config
+-I./build/config
+
+
+
