@@ -197,6 +197,8 @@ static void app_tcp_server_single_conn_task(void* arg)
             {
                 ESP_LOGI(TAG_XLI, "Received %d bytes from socket_fd %d:", len, client_sockfd);
                 ESP_LOGI(TAG_XLI, "%s", rx_buffer);
+
+                send(client_sockfd, rx_buffer, sizeof(rx_buffer) / 2 - 1, 0);
             }
         }
     }
