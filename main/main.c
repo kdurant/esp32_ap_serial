@@ -151,6 +151,12 @@ void app_main()
                 NULL,
                 10,
                 NULL);
+    xTaskCreate(uartRxTask,
+                "uart_receive_task",
+                (uint16_t)TCP_SERVER_TASK_STK_SIZE,
+                NULL,
+                10,
+                NULL);
 }
 
 /**=============================================================================
@@ -202,8 +208,13 @@ static void app_tcp_server_single_conn_task(void* arg)
         }
         ESP_LOGI(TAG_XLI, "A new client is connected, socket_fd=%d, addr=%s", client_sockfd, inet_ntoa(client_addr.sin_addr));
 
+        struct timeval timeout = {1, 0};
+        setsockopt(client_sockfd, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(struct timeval));
         while(1)
         {
+            ESP_LOGI(TAG_XLI, "server send data");
+            send(client_sockfd, "nihao", strlen("nihao"), 0);
+
             int len = recv(client_sockfd, rx_buffer, sizeof(rx_buffer) - 1, 0);
             if(len < 0)
             {
@@ -230,6 +241,11 @@ static void app_tcp_server_single_conn_task(void* arg)
                 // send(client_sockfd, rx_buffer, sizeof(rx_buffer) / 2 - 1, 0);
             }
         }
+        // if(UartZynqBuf.frameEnd)
+        // {
+        //     send(client_sockfd, UartZynqBuf.data, UartZynqBuf.len, 0);
+        //     UartZynqBuf.frameEnd = 0x00;
+        // }
     }
 
     vTaskDelete(NULL);

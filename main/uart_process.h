@@ -25,11 +25,14 @@ typedef struct _uartBuf_
 } UartBuf;
 
 extern UartBuf UartTcpBuf;
+extern UartBuf UartZynqBuf;
 
 void uartInitNormal(void);
 
 void uartInitInterrupt(void);
 
 int uart_write_frame(uart_port_t uart_num, const char* src, size_t size);
+
+void uartRxTask();
 
 #endif
