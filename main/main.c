@@ -43,6 +43,8 @@
 #define TCP_SERVER_PORT 6666
 #define TCP_SERVER_LISTEN_CLIENT_NUM 3
 
+int client_sockfd;
+
 /* Private macro -------------------------------------------------------------*/
 #define TAG_XLI __func__
 
@@ -117,6 +119,20 @@ static void echo_task(void* arg)
         // taskYIELD();
         esp_task_wdt_reset();
         vTaskDelay(1 / portTICK_RATE_MS);
+    }
+}
+
+void uartRxTask()
+{
+    while(1)
+    {
+        UartZynqBuf.len = uart_read_bytes(UART_NUM_1, UartZynqBuf.data, RX_BUF_SIZE, 20 / portTICK_RATE_MS);
+        if(UartZynqBuf.len > 0)
+        {
+            if(client_sockfd > 0)
+                send(client_sockfd, (const char*)UartZynqBuf.data, UartZynqBuf.len, 0);
+            UartZynqBuf.frameEnd = 0x01;
+        }
     }
 }
 
@@ -201,20 +217,16 @@ static void app_tcp_server_single_conn_task(void* arg)
     char rx_buffer[512] = {0};
     while(1)
     {
-        int client_sockfd = accept(serv_sockfd, (struct sockaddr*)&client_addr, &client_addr_len);
+        // int
+        client_sockfd = accept(serv_sockfd, (struct sockaddr*)&client_addr, &client_addr_len);
         if(client_sockfd < 0)
         {
             ESP_LOGE(TAG_XLI, "Unable to accept connection: errno %d", errno);
         }
         ESP_LOGI(TAG_XLI, "A new client is connected, socket_fd=%d, addr=%s", client_sockfd, inet_ntoa(client_addr.sin_addr));
 
-        struct timeval timeout = {1, 0};
-        setsockopt(client_sockfd, SOL_SOCKET, SO_RCVTIMEO, (char*)&timeout, sizeof(struct timeval));
         while(1)
         {
-            ESP_LOGI(TAG_XLI, "server send data");
-            send(client_sockfd, "nihao", strlen("nihao"), 0);
-
             int len = recv(client_sockfd, rx_buffer, sizeof(rx_buffer) - 1, 0);
             if(len < 0)
             {

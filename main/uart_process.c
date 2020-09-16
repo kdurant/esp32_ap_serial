@@ -18,33 +18,6 @@ void uartInitNormal(void)
     uart_driver_install(UART_NUM_1, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
 }
 
-void uartRxTask()
-{
-    // static const char* RX_TASK_TAG = "RX_TASK";
-    // esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
-    // uint8_t* data = (uint8_t*)malloc(RX_BUF_SIZE + 1);
-    // while(1)
-    // {
-    //     const int rxBytes = uart_read_bytes(UART_NUM_1, data, RX_BUF_SIZE, 1000 / portTICK_RATE_MS);
-    //     if(rxBytes > 0)
-    //     {
-    //         data[rxBytes] = 0;
-    //         ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
-    //         ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
-    //     }
-    // }
-    // free(data);
-    while(1)
-    {
-        UartZynqBuf.len = uart_read_bytes(UART_NUM_1, UartZynqBuf.data, RX_BUF_SIZE, 20 / portTICK_RATE_MS);
-        if(UartZynqBuf.len > 0)
-        {
-            uart_write_bytes(UART_NUM_1, (const char*)UartZynqBuf.data, UartZynqBuf.len);
-            UartZynqBuf.frameEnd = 0x01;
-        }
-    }
-}
-
 static void IRAM_ATTR uart1_intr_handle(void* arg)
 {
     volatile uart_dev_t* uart = &UART1;
