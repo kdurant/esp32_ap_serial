@@ -34,7 +34,7 @@
 #define EXAMPLE_ESP_WIFI_PASS CONFIG_ESP_WIFI_PASSWORD
 #define EXAMPLE_MAX_STA_CONN CONFIG_ESP_MAX_STA_CONN
 
-#define TCP_SERVER_TASK_STK_SIZE 2048
+#define TCP_SERVER_TASK_STK_SIZE 4096
 #define TCP_SERVER_TASK_PRIO 7
 #define PROCESS_CLIENT_TASK_STK_SIZE 2048
 #define PROCESS_CLIENT_TASK_PRIO 7
@@ -188,7 +188,7 @@ static void app_tcp_server_single_conn_task(void* arg)
     }
     ESP_LOGI(TAG_XLI, "Socket listening");
 
-    char rx_buffer[128] = {0};
+    char rx_buffer[512] = {0};
     while(1)
     {
         int client_sockfd = accept(serv_sockfd, (struct sockaddr*)&client_addr, &client_addr_len);
@@ -220,6 +220,9 @@ static void app_tcp_server_single_conn_task(void* arg)
                 ESP_LOGI(TAG_XLI, "Received %d bytes from socket_fd %d:", len, client_sockfd);
                 ESP_LOGI(TAG_XLI, "%s", rx_buffer);
 
+                // memcpy(UartTcpBuf.data, rx_buffer, len);
+                // UartTcpBuf.len      = len;
+                // UartTcpBuf.frameEnd = 0x01;
                 send(client_sockfd, rx_buffer, sizeof(rx_buffer) / 2 - 1, 0);
             }
         }
