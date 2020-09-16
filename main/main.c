@@ -16,6 +16,7 @@
 #include "esp_event_loop.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "esp_task_wdt.h"
 
 #include "lwip/err.h"
 #include "lwip/sockets.h"
@@ -113,7 +114,9 @@ static void echo_task(void* arg)
             uart_write_bytes(UART_NUM_1, (const char*)UartTcpBuf.data, UartTcpBuf.len);
             UartTcpBuf.frameEnd = 0x00;
         }
-        taskYIELD();
+        // taskYIELD();
+        esp_task_wdt_reset();
+        vTaskDelay(1 / portTICK_RATE_MS);
     }
 }
 
