@@ -1,6 +1,6 @@
 #include "uart_process.h"
 
-UartRxBuf uartRxBuf;
+UartBuf UartTcpBuf;
 
 void uartInitNormal(void)
 {
@@ -46,8 +46,8 @@ static void IRAM_ATTR uart1_intr_handle(void* arg)
         uart->int_clr.rxfifo_full = 1;
         while(uart->status.rxfifo_cnt)
         {
-            uartRxBuf.data[uartRxBuf.len] = uart->fifo.rw_byte;
-            uartRxBuf.len++;
+            UartTcpBuf.data[UartTcpBuf.len] = uart->fifo.rw_byte;
+            UartTcpBuf.len++;
         }
     }
 
@@ -57,22 +57,22 @@ static void IRAM_ATTR uart1_intr_handle(void* arg)
 
         while(uart->status.rxfifo_cnt)
         {
-            uartRxBuf.data[uartRxBuf.len] = uart->fifo.rw_byte;
-            uartRxBuf.len++;
+            UartTcpBuf.data[UartTcpBuf.len] = uart->fifo.rw_byte;
+            UartTcpBuf.len++;
         }
-        uartRxBuf.frameEnd = 1;
+        UartTcpBuf.frameEnd = 1;
     }
 
-    if(uartRxBuf.frameEnd)
+    if(UartTcpBuf.frameEnd)
     {
-        // uart_write_frame(UART_NUM_1, (char*)(uartRxBuf.data), uartRxBuf.len);
-        while(uartRxBuf.len > 0)
+        // uart_write_frame(UART_NUM_1, (char*)(UartTcpBuf.data), UartTcpBuf.len);
+        while(UartTcpBuf.len > 0)
         {
-            uart_write_bytes(UART_NUM_1, (char*)(uartRxBuf.data), uartRxBuf.len);
+            uart_write_bytes(UART_NUM_1, (char*)(UartTcpBuf.data), UartTcpBuf.len);
         }
 
-        uartRxBuf.frameEnd = 0;
-        uartRxBuf.len      = 0;
+        UartTcpBuf.frameEnd = 0;
+        UartTcpBuf.len      = 0;
     }
 
     // uart_clear_intr_status(UART_NUM_1, UART_RXFIFO_FULL_INT_CLR | UART_RXFIFO_TOUT_INT_CLR);

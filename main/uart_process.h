@@ -17,12 +17,14 @@
 #define TXD_PIN (GPIO_NUM_14)
 #define RXD_PIN (GPIO_NUM_15)
 
-typedef struct _uartRxBuf_
+typedef struct _uartBuf_
 {
     uint8_t  frameEnd;
     uint16_t len;
     uint8_t  data[RX_BUF_SIZE];
-} UartRxBuf;
+} UartBuf;
+
+extern UartBuf UartTcpBuf;
 
 void uartInitNormal(void);
 
